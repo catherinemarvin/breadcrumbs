@@ -29,6 +29,8 @@
 
         currentUser = Parse.User.current();
 
+        $("#welcomeMessage").text("Welcome, "+currentUser.getUsername());
+
         var mapOptions = {
           zoom: 15,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -199,7 +201,7 @@
   <body>
     <div class="container">
       <div class="hero-unit">
-        <h1>Welcome!</h1>
+        <h1 id="welcomeMessage">Welcome!</h1>
         <p>Breadcrumbs lets you leave messages, or crumbs, for other people to chance upon.</p>
       </div>
 

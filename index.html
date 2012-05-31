@@ -27,6 +27,7 @@
           user.signUp(null, {
             success: function (user) {
               console.log("Sign-up successful.");
+              window.location = "./main.html";
             },
             error: function (user, error) {
               alert("Error: " + error.code + " " + error.message);
@@ -35,14 +36,15 @@
         });
 
         $("#loginButton").click(function () {
-          Parse.User.logIn($("#loginUsername").val()), $("#loginPassword").val(), {
+          Parse.User.logIn($("#loginUsername").val(), $("#loginPassword").val(), {
             success: function (user) {
               console.log("Login successful.");
+              window.location = "./main.html";
             },
             error: function (user, error) {
               alert("Error: " + error.code + " " + error.message);
             }
-          }
+          });
         });
 
       });
