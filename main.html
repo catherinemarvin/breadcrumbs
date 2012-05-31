@@ -8,6 +8,8 @@
     
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Questrial' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
     <link href="css/main.css" rel="stylesheet">
 
     <script src="js/jquery-1.7.2.min.js"></script>
@@ -53,6 +55,7 @@
             currentPosition.longitude = position.coords.longitude;
 
             map.setCenter(pos);
+            loadCrumbs();
           }, function () {
             console.log("Geolocation service failed.");
           });
@@ -169,10 +172,6 @@
           });
         });
 
-        $("#loadCrumbs").click(function () {
-          loadCrumbs();
-        });
-
       });
     </script>
 
@@ -202,7 +201,7 @@
     <div class="container">
       <div class="hero-unit">
         <h1 id="welcomeMessage">Welcome!</h1>
-        <p>Breadcrumbs lets you leave messages, or crumbs, for other people to chance upon.</p>
+        <p>Breadcrumbs lets you leave messages, or crumbs, for other people to chance upon. Add a crumb wherever you are and click to discover new ones around you.</p>
       </div>
 
       <div class="row">
@@ -214,9 +213,9 @@
             <input id="content" placeholder="content">
             <button id="addCrumb">Add Crumb</button>
           -->
-            <input id="title" placeholder="title"></input>
-            <input id="content" placeholder="content">
-            <button id="addCrumb">Add Crumb</button>
+            <input id="title" type="text" class="input-large" placeholder="title"></input>
+            <textarea type="text" class="input-large" placeholder="content"></textarea>
+            <button class="btn btn-primary" id="addCrumb">Add Crumb</button>
           </div>
         </div>
         <div class="span6">
@@ -232,16 +231,6 @@
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="span12">
-          <h3>Test console :3</h3>
-          <p>
-           
-          </p>
-          <p>
-            <button id="loadCrumbs">Load Crumbs</button>
-          </p>
-        </div>
     
   </body>
 

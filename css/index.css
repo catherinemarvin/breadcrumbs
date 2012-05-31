@@ -1,0 +1,34 @@
+body {
+	background: #757449;
+	padding-top: 60px;
+	font-family: 'Questrial', sans-serif;
+}
+
+.hero-unit {
+	background: #E2DF9A;
+}
+
+.well {
+	background: #4B490B;
+	color: #FFFFFF;
+}
+
+label {
+	color: #FFFFFF;
+}
+
+h1 {
+	font-family: 'Lobster', cursive;
+}
+
+h2 {
+	color: #EBE54D;
+}
+
+h3 {
+	color: #EBE54D;
+}
+
+.btn {
+	background: #FF0051;
+}
