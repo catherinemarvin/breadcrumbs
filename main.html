@@ -17,10 +17,12 @@
     <script>
       //document stuff
       var currentUser = null;
+      var map = null;
+      var currentPosition = {}
 
       $(document).ready(function () {
         console.log("test");
-        var map = null;
+        
         var pos = null;
 
         Parse.initialize("a7mtvwmPbKo7HaC6xavFLigPdgjk8kzMPHOx5H56", "YDBdOPnfUj9qO4lEvg8xEjZk0WLfc4XKKBm2nCVH");
@@ -38,17 +40,15 @@
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function (position) {
             pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            console.log(position.coords.latitude, position.coords.longitude);
             var parsePos = new Parse.GeoPoint({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
             });
             currentUser.set("location",parsePos);
             console.log(position.coords);
-            var infowindow = new google.maps.InfoWindow({
-              map : map,
-              position: pos,
-              content: "Location found using HTML5"
-            });
+            currentPosition.latitude = position.coords.latitude;
+            currentPosition.longitude = position.coords.longitude;
 
             map.setCenter(pos);
           }, function () {
@@ -69,7 +69,7 @@
           var author = crumbJSON.author;
           var title = crumbJSON.title;
           var content = crumbJSON.content;
-          console.log("Author username: ", author.get("username"));
+          console.log("Author: "+author);
 
           var crumb = new Crumb();
 
@@ -107,11 +107,61 @@
           });
         }
 
+        var markMap = function (crumb) {
+          console.log("Adding crumb to map...");
+          var title = crumb.get("title");
+          var content = crumb.get("content");
+          console.log("Title: "+title);
+          console.log("Content: "+content);
+          var author = crumb.get("author");
+          var geoPoint = crumb.get("location");
+          console.log("Author: "+author);
+          var latitude = geoPoint.latitude;
+          var longitude = geoPoint.longitude;
+          console.log("Coordinates: "+latitude+","+longitude);
+          var latLng = new google.maps.LatLng(latitude,longitude);
+          var marker = new google.maps.Marker({
+            position: latLng,
+            title: title
+          });
+
+          marker.crumbsInfo = {
+            title: title,
+            content: content,
+            author: author
+          }
+
+          marker.setMap(map);
+
+          google.maps.event.addListener(marker, 'click', function () {
+            console.log("Clicked a marker!");
+            console.log(marker.crumbsInfo);
+            loadCrumbInfo(marker.crumbsInfo);
+          });
+
+          console.log("~~~~~~~~~~~~~~~~~~~~~~~");
+        }
+
+        var loadCrumbInfo = function (crumbInfo) {
+          console.log("Loading information...");
+          console.log(crumbInfo);
+          var title = crumbInfo.title;
+          var content = crumbInfo.content;
+          var author = crumbInfo.author;
+          console.log(crumbInfo.author);
+
+          $("#crumbTitle").text(title);
+          $("#crumbContent").text(content);
+          $("#crumbAuthor").text(author);
+        }
+
         $("#addCrumb").click(function () {
+          console.log(currentPosition);
+          
           addCrumb({
-            'latitude': $("#latitude").val(),
-            'longitude': $("#longitude").val(),
-            'author' : Parse.User.current(),
+            'latitude': currentPosition.latitude,
+            'longitude': currentPosition.longitude,
+            'author' : Parse.User.current().getUsername(),
             'title': $("#title").val(),
             'content': $("#content").val()
           });
@@ -156,6 +206,16 @@
       <div class="row">
         <div class="span3">
           <h3>Leave a Crumb</h3>
+          <div class="well">
+            <!--
+            <input id="title" placeholder="title"></input>
+            <input id="content" placeholder="content">
+            <button id="addCrumb">Add Crumb</button>
+          -->
+            <input id="title" placeholder="title"></input>
+            <input id="content" placeholder="content">
+            <button id="addCrumb">Add Crumb</button>
+          </div>
         </div>
         <div class="span6">
           <h2>Map</h2>
@@ -163,17 +223,18 @@
         </div>
         <div class="span3">
           <h3>Selected Crumb</h3>
+          <div class="well">
+            <p><strong>Title: </strong><div id="crumbTitle"></div></p>
+            <p><Strong>Content: </strong><div id="crumbContent"></div></p>
+            <p><Strong>Author: </strong><div id="crumbAuthor"></div></p>
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="span12">
           <h3>Test console :3</h3>
           <p>
-            <input id="latitude" placeholder="latitude"></input>
-            <input id="longitude" placeholder="longitude"></input>
-            <input id="title" placeholder="title"></input>
-            <input id="content" placeholder="content">
-            <button id="addCrumb">Add Crumb</button>
+           
           </p>
           <p>
             <button id="loadCrumbs">Load Crumbs</button>
