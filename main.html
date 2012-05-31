@@ -1,0 +1,185 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Breadcrumbs</title>
+    <meta name="description" content="Leave notes around the neighborhood.">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width">
+    
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="http://www.parsecdn.com/js/parse-1.0.0.min.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCfJ1TRn1dgFBYNjHhm0KL2u9yp02z9hPg&sensor=true"></script>
+
+    <script>
+      //document stuff
+      var currentUser = null;
+
+      $(document).ready(function () {
+        console.log("test");
+        var map = null;
+        var pos = null;
+
+        Parse.initialize("a7mtvwmPbKo7HaC6xavFLigPdgjk8kzMPHOx5H56", "YDBdOPnfUj9qO4lEvg8xEjZk0WLfc4XKKBm2nCVH");
+
+        currentUser = Parse.User.current();
+
+        var mapOptions = {
+          zoom: 15,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+        };
+
+        map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            var parsePos = new Parse.GeoPoint({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            });
+            currentUser.set("location",parsePos);
+            console.log(position.coords);
+            var infowindow = new google.maps.InfoWindow({
+              map : map,
+              position: pos,
+              content: "Location found using HTML5"
+            });
+
+            map.setCenter(pos);
+          }, function () {
+            console.log("Geolocation service failed.");
+          });
+        } else {
+          console.log("Browser does not support geolocation");
+        }
+
+        var addCrumb = function (crumbJSON) {
+          console.log("Let's add a crumb!");
+          var latitude = crumbJSON.latitude;
+          var longitude = crumbJSON.longitude;
+          var point = new Parse.GeoPoint({
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+          });
+          var author = crumbJSON.author;
+          var title = crumbJSON.title;
+          var content = crumbJSON.content;
+          console.log("Author username: ", author.get("username"));
+
+          var crumb = new Crumb();
+
+          crumb.set("location", point);
+          crumb.set("title",title);
+          crumb.set("author",author);
+          crumb.set("content",content);
+
+          crumb.save(null, {
+            success: function (crumb) {
+              console.log("Saved successfully.");
+            },
+            error: function (crumb, error) {
+              console.log("Save failed.");
+              console.log(error);
+            }
+          });
+          
+        }
+
+        var loadCrumbs = function () {
+          console.log("Loading crumbs...");
+          var query = new Parse.Query(Crumb);
+          var userGeoPoint = currentUser.get("location");
+          query.near("location", userGeoPoint);
+          query.limit(10);
+          query.find({
+            success: function (placeObjects) {
+              console.log("Query succeeded. Here is a list of place objects.");
+              console.log(placeObjects);
+              for (i in placeObjects) {
+                markMap(placeObjects[i]);
+              }
+            }
+          });
+        }
+
+        $("#addCrumb").click(function () {
+          addCrumb({
+            'latitude': $("#latitude").val(),
+            'longitude': $("#longitude").val(),
+            'author' : Parse.User.current(),
+            'title': $("#title").val(),
+            'content': $("#content").val()
+          });
+        });
+
+        $("#loadCrumbs").click(function () {
+          loadCrumbs();
+        });
+
+      });
+    </script>
+
+    <script>
+      //this is "backend" logic stuff
+      var Crumb = Parse.Object.extend("Crumb", {
+        //class methods
+      }, {
+        //instance methods
+        title: function () {
+          return this.get("title");
+        },
+        content: function () {
+          return this.get("content");
+        },
+        author: function () {
+          return this.get("author");
+        },
+        location: function () {
+          return this.get("location");
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="hero-unit">
+        <h1>Welcome!</h1>
+        <p>Breadcrumbs lets you leave messages, or crumbs, for other people to chance upon.</p>
+      </div>
+
+      <div class="row">
+        <div class="span3">
+          <h3>Leave a Crumb</h3>
+        </div>
+        <div class="span6">
+          <h2>Map</h2>
+          <div id="map_canvas"></div>
+        </div>
+        <div class="span3">
+          <h3>Selected Crumb</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12">
+          <h3>Test console :3</h3>
+          <p>
+            <input id="latitude" placeholder="latitude"></input>
+            <input id="longitude" placeholder="longitude"></input>
+            <input id="title" placeholder="title"></input>
+            <input id="content" placeholder="content">
+            <button id="addCrumb">Add Crumb</button>
+          </p>
+          <p>
+            <button id="loadCrumbs">Load Crumbs</button>
+          </p>
+        </div>
+    
+  </body>
+
+</html>

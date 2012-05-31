@@ -1,0 +1,82 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Breadcrumbs</title>
+    <meta name="description" content="Leave notes around the neighborhood.">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width">
+    
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script src="http://www.parsecdn.com/js/parse-1.0.0.min.js"></script>
+
+    <script>
+      //document stuff
+      $(document).ready(function () {
+        Parse.initialize("a7mtvwmPbKo7HaC6xavFLigPdgjk8kzMPHOx5H56", "YDBdOPnfUj9qO4lEvg8xEjZk0WLfc4XKKBm2nCVH");
+
+        $("#registerButton").click(function () {
+          var user = new Parse.User();
+          user.set("username", $("#registerUsername").val());
+          user.set("password", $("#registerPassword").val());
+          user.set("email", $("#registerEmail").val());
+
+          user.signUp(null, {
+            success: function (user) {
+              console.log("Sign-up successful.");
+            },
+            error: function (user, error) {
+              alert("Error: " + error.code + " " + error.message);
+            }
+          });
+        });
+
+        $("#loginButton").click(function () {
+          Parse.User.logIn($("#loginUsername").val()), $("#loginPassword").val(), {
+            success: function (user) {
+              console.log("Login successful.");
+            },
+            error: function (user, error) {
+              alert("Error: " + error.code + " " + error.message);
+            }
+          }
+        });
+
+      });
+    </script>
+
+    <script>
+      //this is "backend" logic stuff
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="hero-unit">
+        <h1>Welcome!</h1>
+        <p>Breadcrumbs lets you leave messages, or crumbs, for other people to chance upon.</p>
+      </div>
+
+      <div class="row">
+        <div class="span6">
+          <h2>Register</h2>
+          <label>Username</label><input type="text" id="registerUsername" class="input-medium" placeholder="Fluttershy"></input>
+          <label>Password</label><input type="password" id="registerPassword"class="input-medium" placeholder="ponies"></input>
+          <label>E-mail</label><input type="email" id="registerEmail" class="input-medium" placeholder="foo@bar.com"></input>
+          <br><button id="registerButton" class="btn btn-primary">Register</button>
+        </div>
+
+        <div class="span6">
+          <h2>Login</h2>
+          <label>Username</label><input type="text" id="loginUsername" class="input-medium" placeholder="Pinkie Pie"></input>
+          <label>Password</label><input type="password" id="loginPassword" class="input-medium" placeholder="cupcakes"></input>
+          <br><button id="loginButton" class="btn btn-primary">Login</button>
+        </div>
+      </div>
+    
+  </body>
+
+</html>
